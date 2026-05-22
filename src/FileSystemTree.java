@@ -42,7 +42,6 @@ public class FileSystemTree {
         Path filePath = Paths.get(path);
         Path rootPart = filePath.getRoot();
         String rootName = (rootPart != null) ? rootPart.toString() : "/";
-        Boolean targetType = isFile(filePath);
         TreeNode current = root;
         TreeNode diskNode =current.findChild(rootName);
         if (diskNode == null){
@@ -55,10 +54,13 @@ public class FileSystemTree {
         for (int i = 0; i < filePath.getNameCount(); i++){
             Path pathPart = filePath.getName(i);
             String part = pathPart.toString();
+            // Получаем путь до текущей папки
             Path subPath = rootPart != null
                     ? rootPart.resolve(filePath.subpath(0, i + 1))
                     : filePath.subpath(0, i + 1);
+            // Проверяем, существует ли данный путь и чем он является
             Boolean isFile = isFile(subPath);
+
             TreeNode child = current.findChild(part);
             if (child == null){
                 child = new TreeNode(part, isFile);
@@ -78,9 +80,9 @@ public class FileSystemTree {
      */
     private Boolean isFile(Path path) {
         try {
-            if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)) {
+            if (Files.isRegularFile(path)) {
                 return true;
-            } else if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+            } else if (Files.isDirectory(path)) {
                 return false;
             } else {
                 // Существует, но не файл и не папка
